@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Errors.h"
 #include "SharedState.h"
+#include "Sync/Condvar.h"
+#include "Sync/LockGuard.h"
 #include "../SharedPtr/Src/SharedPtr.hpp"
 
 template <class T>
@@ -22,16 +25,16 @@ public:
     // One-shot
     T Get() 
     {
-        std::unique_lock locker(shared_state_->mutex);
+        LockGuard lock_guard(shared_state_->mutex);
         while (ContinueWaiting())
-          shared_state_->continue_waiting.wait(locker);
+            shared_state_->continue_waiting.Wait(shared_state_->mutex);
 
         if (shared_state_->value.has_value())
         {
-          T object(std::move(shared_state_->value.value()));
-          shared_state_->value = std::unexpected(std::make_exception_ptr(PromiseAlreadySatisfiedError()));
-          shared_state_->set_exception = true;
-          return object;
+            T object(std::move(shared_state_->value.value()));
+            shared_state_->value = std::unexpected(std::make_exception_ptr(PromiseAlreadySatisfiedError()));
+            shared_state_->set_exception = true;
+            return object;
         }
 
         std::rethrow_exception(shared_state_->value.error());
@@ -39,12 +42,12 @@ public:
 
     bool Valid() const 
     {
-        std::lock_guard locker(shared_state_->mutex);
+        LockGuard locker(shared_state_->mutex);
         return !shared_state_->set_exception;
     }
 
 private:
-    Future(const std::shared_ptr<SharedState<T>>& other) : 
+    Future(const SharedPtr<SharedState<T>, Owner>& other) : 
     shared_state_ (other)
     { }
 
@@ -54,5 +57,5 @@ private:
     }
 
 private:
-    SharedPtr<SharedState<T>> shared_state_;
+    SharedPtr<SharedState<T>, Owner> shared_state_;
 };

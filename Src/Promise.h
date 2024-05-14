@@ -1,7 +1,9 @@
 #pragma once
 
-#include "LockGuard.h"
+#include "Errors.h"
+#include "Future.h"
 #include "SharedState.h"
+#include "Sync/LockGuard.h"
 #include "../SharedPtr/Src/SharedPtr.hpp"
 
 template <class T>
@@ -9,9 +11,9 @@ class Promise
 {
 public:
     Promise() :
-    shared_state_ (std::make_shared<SharedState<T>>(std::unexpected(std::make_exception_ptr(NoStateError()))))
+    shared_state_ (MakeShared<SharedState<T>, std::expected<T, std::exception_ptr>>(std::unexpected(std::make_exception_ptr(NoStateError()))))
     {
-      printf("Promise ctor\n");
+        printf("Promise ctor\n");
     }
 
     // Non-copyable
@@ -35,7 +37,7 @@ public:
         LockGuard locker(shared_state_->mutex);
 
         shared_state_->value = std::move(value);
-        shared_state_->continue_waiting.notify_one();
+        shared_state_->continue_waiting.NotifyOne();
     }
 
     // One-shot
@@ -45,18 +47,18 @@ public:
 
         shared_state_->value         = std::unexpected(exception);
         shared_state_->set_exception = true;
-        shared_state_->continue_waiting.notify_one();
+        shared_state_->continue_waiting.NotifyOne();
     }
 
     ~Promise() 
     {
-        std::lock_guard locker(shared_state_->mutex);
+        LockGuard locker(shared_state_->mutex);
 
         shared_state_->value         = std::unexpected(std::make_exception_ptr(BrokenPromiseError()));
         shared_state_->set_exception = true;
-        shared_state_->continue_waiting.notify_one();
+        shared_state_->continue_waiting.NotifyOne();
     }
 
 private:
-    SharedPtr<SharedState<T>> shared_state_;
+    SharedPtr<SharedState<T>, Owner> shared_state_;
 };
