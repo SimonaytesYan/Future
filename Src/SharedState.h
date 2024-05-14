@@ -13,5 +13,6 @@ struct SharedState
   }
 
   std::expected<T, std::exception_ptr> value;
-  // TODO add some
+  twist::ed::std::mutex                mutex;
+  twist::ed::std::condition_variable   continue_waiting;
 };
