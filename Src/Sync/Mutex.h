@@ -5,7 +5,8 @@
 #include <atomic>
 #include <cstdint>
 
-class Mutex {
+class Mutex 
+{
 public:
     void Lock() {
       uint32_t expected = MUTEX_FREE;
@@ -36,9 +37,6 @@ public:
         FutexWake((int*)&futex_block_);
       }
     }
-
-  // BasicLockable
-  // https://en.cppreference.com/w/cpp/named_req/BasicLockable
 
     void lock() 
     { Lock(); }
