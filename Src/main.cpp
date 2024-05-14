@@ -11,10 +11,9 @@ int main()
     std::thread([&promise]
                 {
                     int counter = 0;
-                    while(counter != 50000)
-                    {
-                        fprintf(stderr, "cnt = %d\n", counter++);
-                    }
+                    while(counter != INT_MAX)
+                    { counter++; }
+
                     promise.SetValue(9); 
                     fprintf(stderr, "SetValue(9)\n");
 
@@ -22,5 +21,5 @@ int main()
 
     fprintf(stderr, "Start waiting\n");
     int value = future.Get();
-    fprintf(stderr, "Value = $d\n", value);
+    fprintf(stderr, "Value = %d\n", value);
 }

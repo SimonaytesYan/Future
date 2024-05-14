@@ -12,9 +12,7 @@ class Promise
 public:
     Promise() :
     shared_state_ (MakeShared<SharedState<T>, std::expected<T, std::exception_ptr>>(std::unexpected(std::make_exception_ptr(NoStateError()))))
-    {
-        printf("Promise ctor\n");
-    }
+    { }
 
     // Non-copyable
     Promise(const Promise&) = delete;
