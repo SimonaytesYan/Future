@@ -1,5 +1,5 @@
-RELEASE_FLAGS = -O2 -std=c++2a
-SANITIZER_FLAGS = -g -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,nonnull-attribute,leak,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
+RELEASE_FLAGS = -O2 -std=c++2b
+SANITIZER_FLAGS = -std=c++2b -g -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,nonnull-attribute,leak,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 FLAGS 		  = $(SANITIZER_FLAGS)
 COMPILER      = g++
 
@@ -14,6 +14,8 @@ all: create_folders
 
 update_submodules:
 	git submodule update --init --recursive --remote
+	git add SharedPtr
+	git commit -m "Update submodules"
 
 run: create_folders
 	./$(ELF_FILE)
