@@ -1,0 +1,3 @@
+[submodule "SharedPtr"]
+	path = SharedPtr
+	url = https://github.com/SimonaytesYan/SharedPtr
