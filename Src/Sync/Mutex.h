@@ -19,7 +19,7 @@ public:
         expected = MUTEX_ACQUIRED;
         futex_block_.compare_exchange_strong(expected, MUTEX_ACQUIRED_QUEUE);
         if (expected == MUTEX_ACQUIRED || expected == MUTEX_ACQUIRED_QUEUE) {
-          FutexWait((int*)&futex_block_, MUTEX_ACQUIRED_QUEUE);
+          FutexWait((uint32_t*)&futex_block_, MUTEX_ACQUIRED_QUEUE);
         }
 
         expected = MUTEX_FREE;
@@ -34,7 +34,7 @@ public:
       uint32_t expected = MUTEX_ACQUIRED;
       if (!futex_block_.compare_exchange_strong(expected, MUTEX_FREE)) {
         futex_block_.store(MUTEX_FREE);
-        FutexWake((int*)&futex_block_);
+        FutexWake((uint32_t*)&futex_block_);
       }
     }
 

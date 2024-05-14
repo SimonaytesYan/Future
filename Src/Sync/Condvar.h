@@ -13,7 +13,7 @@ public:
             wakeup_.store(NO);
         mutex.unlock();
 
-        FutexWait((int*)&wakeup_, NO);
+        FutexWait((uint32_t*)&wakeup_, NO);
 
         mutex.lock();
         waiters_.fetch_add(-1);
@@ -25,7 +25,7 @@ public:
         if (waiters_number != 0) 
         {
             wakeup_.store(NOTIFY);
-            FutexWake((int*)&wakeup_);
+            FutexWake((uint32_t*)&wakeup_);
         }
     }
 
@@ -35,7 +35,7 @@ public:
         if (waiters_number != 0) 
         {
             wakeup_.store(NOTIFY);
-            FutexWake((int*)&wakeup_);
+            FutexWake((uint32_t*)&wakeup_);
         }
     }
 

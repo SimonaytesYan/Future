@@ -5,7 +5,14 @@
 #include <sys/syscall.h> 
 #include <unistd.h>
 
-void FutexWait(int* address, const uint32_t value)
+long futex(uint32_t *uaddr, int futex_op, uint32_t val,
+           const struct timespec *timeout,   /* or: uint32_t val2 */
+           uint32_t *uaddr2, uint32_t val3)
+{
+    return syscall(SYS_futex, uaddr, futex_op, val, timeout, uaddr2, val3);
+}
+
+void FutexWait(uint32_t* address, const uint32_t value)
 {
     while (true)
     {
@@ -16,7 +23,7 @@ void FutexWait(int* address, const uint32_t value)
     }
 }
 
-void FutexWake(int* address)
+void FutexWake(uint32_t* address)
 {
     while(true)
     {
