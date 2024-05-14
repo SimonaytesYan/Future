@@ -2,6 +2,7 @@
 
 #include "Errors.h"
 #include "Future.h"
+#include "Move.h"
 #include "SharedState.h"
 #include "Sync/LockGuard.h"
 #include "../SharedPtr/Src/SharedPtr.hpp"
@@ -34,7 +35,7 @@ public:
     {
         LockGuard locker(shared_state_->mutex);
 
-        shared_state_->value = std::move(value);
+        shared_state_->value = move(value);
         shared_state_->continue_waiting.NotifyOne();
     }
 

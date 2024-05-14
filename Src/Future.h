@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Errors.h"
+#include "Move.h"
 #include "SharedState.h"
 #include "Sync/Condvar.h"
 #include "Sync/LockGuard.h"
@@ -31,7 +32,7 @@ public:
 
         if (shared_state_->value.has_value())
         {
-            T object(std::move(shared_state_->value.value()));
+            T object(move(shared_state_->value.value()));
             shared_state_->value = std::unexpected(std::make_exception_ptr(PromiseAlreadySatisfiedError()));
             shared_state_->set_exception = true;
             return object;
