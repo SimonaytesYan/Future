@@ -1,6 +1,6 @@
 #pragma once
 
-template< class Mutex >
+template<class Mutex>
 class LockGuard
 {
 public:
