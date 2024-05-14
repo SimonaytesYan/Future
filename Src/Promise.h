@@ -1,5 +1,9 @@
 #pragma once
 
+#include "LockGuard.h"
+#include "SharedState.h"
+#include "../SharedPtr/Src/SharedPtr.hpp"
+
 template <class T>
 class Promise
 {
@@ -25,22 +29,34 @@ public:
     }
 
     // One-shot
+    // T - movable
     void SetValue(T value) 
     {
-        // TODO implement
+        LockGuard locker(shared_state_->mutex);
+
+        shared_state_->value = std::move(value);
+        shared_state_->continue_waiting.notify_one();
     }
 
     // One-shot
     void SetException(std::exception_ptr exception) 
     {
-      // TODO implement
+        LockGuard locker(shared_state_->mutex);
+
+        shared_state_->value         = std::unexpected(exception);
+        shared_state_->set_exception = true;
+        shared_state_->continue_waiting.notify_one();
     }
 
     ~Promise() 
     {
-        // TODO implement
+        std::lock_guard locker(shared_state_->mutex);
+
+        shared_state_->value         = std::unexpected(std::make_exception_ptr(BrokenPromiseError()));
+        shared_state_->set_exception = true;
+        shared_state_->continue_waiting.notify_one();
     }
 
 private:
-    std::shared_ptr<SharedState<T>> shared_state_;
+    SharedPtr<SharedState<T>> shared_state_;
 };

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <mutex>
+#include <condition_variable>
+#include <expected>
+
 template <class T>
 struct SharedState
 {
@@ -13,6 +17,6 @@ struct SharedState
   }
 
   std::expected<T, std::exception_ptr> value;
-  twist::ed::std::mutex                mutex;
-  twist::ed::std::condition_variable   continue_waiting;
+  std::mutex                mutex;
+  std::condition_variable   continue_waiting;
 };

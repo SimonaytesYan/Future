@@ -1,5 +1,8 @@
 #pragma once
 
+#include "SharedState.h"
+#include "../SharedPtr/Src/SharedPtr.hpp"
+
 template <class T>
 class Future
 {
@@ -27,7 +30,7 @@ public:
       // TODO implement
     }
 
- private:
+private:
     Future(const std::shared_ptr<SharedState<T>>& other) : 
     shared_state_ (other)
     { 
@@ -39,6 +42,6 @@ public:
       // TODO implement
     }
 
- private:
-  std::shared_ptr<SharedState<T>> shared_state_;
+private:
+    SharedPtr<SharedState<T>> shared_state_;
 };
