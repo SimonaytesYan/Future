@@ -35,7 +35,7 @@ public:
     {
         LockGuard locker(shared_state_->mutex);
 
-        shared_state_->value = move(value);
+        shared_state_->value = Move(value);
         shared_state_->continue_waiting.NotifyOne();
     }
 
