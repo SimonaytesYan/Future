@@ -67,11 +67,15 @@ class Unexpected
 {
     Unexpected(const Unexpected& other) = default; 
     Unexpected(Unexpected&& other)      = default;
-    Unexpected(ErrorT&& error);
+    Unexpected(ErrorT&& error) :
+    error (error)
+    { }
 
-    ErrorT& Error();
+    ErrorT& Error()
+    { return error; }
 
-    bool operator==(const Unexpected& other);
+    bool operator==(const Unexpected& other)
+    { return error == other.error; }
 
 private:
     ErrorT error;
