@@ -9,24 +9,48 @@ class Expected
     Expected(const Expected& other) = default;
     Expected(Expected&& other) = default;
 
-    Expected(Unexpected<ErrorT> unexpected);
-    Expected(ValueT&& value);
+    Expected(Unexpected<ErrorT>&& unexpected) :
+    has_value (false),
+    error     (unexpected.Error())
+    { }
 
-    bool HasValue();
+    Expected(ValueT&& value) :
+    has_value (true),
+    value (value)
+    { }
 
-    ValueT& Value();
-    const ValueT& Value() const;
+    bool HasValue()
+    { return has_value; }
+    
+    ValueT& Value()
+    { return value; }
+    const ValueT& Value() const
+    { return value; }
 
-    ErrorT& Error();
-    const ErrorT& Error() const;
+    ErrorT& Error()
+    { return error; }
+    const ErrorT& Error() const
+    { return error; }
 
-    ValueT* operator->();
-    const ValueT* operator->() const;
+    ValueT* operator->()
+    { return &value; }
+    const ValueT* operator->() const
+    { return &value; }
 
-    ValueT& operator*();
-    const ValueT& operator*() const;
+    ValueT& operator*()
+    { return value; }
+    const ValueT& operator*() const
+    { return value; }
 
-    bool operator==(const Expected& other);
+    bool operator==(const Expected& other)
+    {
+        if (has_value != other.has_value)
+            return false;
+        
+        if (has_value)
+            return value == other.value;
+        return error == other.error;
+    }
 
 private:
     bool has_value;
