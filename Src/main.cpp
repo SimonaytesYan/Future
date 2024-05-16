@@ -1,5 +1,7 @@
 #include <thread>
 
+#include "Expected.h"
+
 #include "Future.h"
 #include "Promise.h"
 

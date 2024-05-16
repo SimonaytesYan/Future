@@ -1,25 +1,32 @@
 #pragma once
 
+template <class ErrorT>
+class Unexpected;
+
 template <class ValueT, class ErrorT>
 class Expected
 {
+    Expected(const Expected& other) = default;
+    Expected(Expected&& other) = default;
+
+    Expected(Unexpected<ErrorT> unexpected);
+    Expected(ValueT&& value);
+
     bool HasValue();
 
     ValueT& Value();
     const ValueT& Value() const;
-    ValueT&& Value();
 
     ErrorT& Error();
-    const ErrorT& ErrorT() const;
-    ErrorT&& ErrorT();
+    const ErrorT& Error() const;
 
     ValueT* operator->();
     const ValueT* operator->() const;
-    
+
     ValueT& operator*();
     const ValueT& operator*() const;
 
-    bool operator==(const Unexpected& other);
+    bool operator==(const Expected& other);
 
 private:
     bool has_value;
