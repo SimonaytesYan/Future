@@ -6,8 +6,22 @@ class Unexpected;
 template <class ValueT, class ErrorT>
 class Expected
 {
-    Expected(const Expected& other) = default;
+public:
+    Expected(const Expected& other) :
+    has_value (other.has_value)
+    {
+        if (has_value)
+            value = other.value;
+        else
+            error = other.error;
+    }
+    
     Expected(Expected&& other) = default;
+
+    Expected() :
+    has_value (true),
+    value     ()
+    { }
 
     Expected(Unexpected<ErrorT>&& unexpected) :
     has_value (false),
@@ -42,6 +56,34 @@ class Expected
     const ValueT& operator*() const
     { return value; }
 
+    Expected& operator=(const Expected& other)
+    {
+        has_value = other.has_value;
+
+        if (has_value)
+            value = other.value;
+        else
+            error = other.error;
+
+        return *this;
+    }
+    
+    Expected& operator=(ValueT&& new_value)
+    {
+        value = new_value;
+        has_value = true;
+
+        return *this;
+    }
+
+    Expected& operator=(Unexpected<ErrorT>& new_error)
+    {
+        error     = new_error.Error();
+        has_value = false;
+
+        return *this;
+    } 
+
     bool operator==(const Expected& other)
     {
         if (has_value != other.has_value)
@@ -50,6 +92,14 @@ class Expected
         if (has_value)
             return value == other.value;
         return error == other.error;
+    }
+
+    ~Expected()
+    {
+        if (has_value)
+            value.~ValueT();
+        else
+            error.~ErrorT();
     }
 
 private:
@@ -65,6 +115,7 @@ private:
 template <class ErrorT>
 class Unexpected
 {
+public:
     Unexpected(const Unexpected& other) = default; 
     Unexpected(Unexpected&& other)      = default;
     Unexpected(ErrorT&& error) :

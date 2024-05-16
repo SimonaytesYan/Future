@@ -25,21 +25,15 @@ void Test2()
     Promise<int> p;
     auto f = p.MakeFuture();
 
-    try 
-    {
-      throw TestException();
-    } 
-    catch (...) 
-    {
-        p.SetException(std::current_exception());
-    }
+    p.SetException(TestException());
 
     try
     {
         f.Get();
     }
-    catch(const TestException& exception)
+    catch(const size_t& exception)
     {
+        assert(typeid(TestException).hash_code() == exception);
         printf("OK\n");
         return;
     }
@@ -81,27 +75,20 @@ void Test4()
     clock_t time_start = clock();
     std::thread([&p] 
                 {
-                    try 
-                    {
-                        int counter = 0;
-                        while(counter != INT_MAX)
-                        { counter++; }
-
-                        throw TestException();
-                    } 
-                    catch (...) 
-                    {
-                        p.SetException(std::current_exception());
-                    }
+                    int counter = 0;
+                    while(counter != INT_MAX)
+                    { counter++; }
+                    p.SetException(TestException());
                 }).detach();
     try
     {
         f.Get();
     }
-    catch(const TestException& exception)
+    catch(const size_t& exception)
     {
         clock_t time_end = clock();
         assert((double)(time_end - time_start)/CLOCKS_PER_SEC > 1);
+        assert(typeid(TestException).hash_code() == exception);
         printf("OK\n");
         return;
     }
@@ -111,7 +98,6 @@ void Test4()
 
 int main()
 {
-
     Test1();
     Test2();
     Test3();

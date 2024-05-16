@@ -11,14 +11,13 @@ struct SharedState
     SharedState()
     {}
 
-    SharedState(std::expected<T, std::exception_ptr> other_value)
-    {
-        value = other_value;
-    }
+    SharedState(Expected<T, size_t> other_value) :
+    value (other_value)
+    { }
 
     bool set_exception = false;
 
-    std::expected<T, std::exception_ptr> value;
-    Mutex                                mutex;
-    CondVar                              continue_waiting;
+    Expected<T, size_t>  value;                 // <value type, hash_code of exception code>
+    Mutex                mutex;
+    CondVar              continue_waiting;
 };

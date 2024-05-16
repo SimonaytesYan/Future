@@ -12,7 +12,7 @@ class Promise
 {
 public:
     Promise() :
-    shared_state_ (MakeShared<SharedState<T>, std::expected<T, std::exception_ptr>>(std::unexpected(std::make_exception_ptr(NoStateError()))))
+    shared_state_ (MakeShared<SharedState<T>, Expected<T, size_t>>(Unexpected(typeid(NoStateError).hash_code())))
     { }
 
     // Non-copyable
@@ -40,11 +40,12 @@ public:
     }
 
     // One-shot
-    void SetException(std::exception_ptr exception) 
+    template <class SomeType>
+    void SetException(SomeType exception) 
     {
         LockGuard locker(shared_state_->mutex);
+        shared_state_->value         = Unexpected(typeid(exception).hash_code());
 
-        shared_state_->value         = std::unexpected(exception);
         shared_state_->set_exception = true;
         shared_state_->continue_waiting.NotifyOne();
     }
@@ -53,7 +54,7 @@ public:
     {
         LockGuard locker(shared_state_->mutex);
 
-        shared_state_->value         = std::unexpected(std::make_exception_ptr(BrokenPromiseError()));
+        shared_state_->value         = Unexpected(typeid(BrokenPromiseError()).hash_code());
         shared_state_->set_exception = true;
         shared_state_->continue_waiting.NotifyOne();
     }

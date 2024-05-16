@@ -30,15 +30,15 @@ public:
         while (ContinueWaiting())
             shared_state_->continue_waiting.Wait(shared_state_->mutex);
 
-        if (shared_state_->value.has_value())
+        if (shared_state_->value.HasValue())
         {
-            T object(Move(shared_state_->value.value()));
-            shared_state_->value = std::unexpected(std::make_exception_ptr(PromiseAlreadySatisfiedError()));
+            T object(Move(shared_state_->value.Value()));
+            shared_state_->value = Unexpected(typeid(PromiseAlreadySatisfiedError()).hash_code());
             shared_state_->set_exception = true;
             return object;
         }
 
-        std::rethrow_exception(shared_state_->value.error());
+        throw shared_state_->value.Error();
     }
 
     bool Valid() const 
@@ -54,7 +54,7 @@ private:
 
     bool ContinueWaiting()
     {
-        return !shared_state_->value.has_value() && !shared_state_->set_exception;
+        return !shared_state_->value.HasValue() && !shared_state_->set_exception;
     }
 
 private:
